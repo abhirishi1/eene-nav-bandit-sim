@@ -142,7 +142,7 @@ Bug numbers refer to [`docs/BUG_REPORT.md`](https://github.com/abhirishi1/eene-n
 | Stage | Issue |
 |-------|-------|
 | Inputs | **No validation of blank values** (tested on small synthetic data, not yet in the bug report). A blank `power` stops step 1 with a cryptic `KeyError`. A blank `mean_time` passes step 1, but step 2 then doesn't finish (still running after 60 s in testing). A blank `mean_consumption` gives no error and silently leaves blank entries in the energy table |
-| Starting either script | Python 3.10+ won't start (bug 2). Missing required arguments give a confusing error (bug 9) |
+| Starting either script | Python 3.10+ won't start on the original code (bug 2, fixed on this branch). Missing required arguments give a confusing error (bug 9) |
 | Saving outputs (both steps) | `--output-dir` without a trailing `/` puts files next to the folder, not inside it (bug 6) |
 | Step 2, loading IDs | Numeric station IDs (e.g. `101`) crash with `KeyError` (bug 1) |
 | Step 2, experiment setup | The SciPy sampler ignores the seed, so results vary between identical runs (bug 11, found later and not yet in the report) |

@@ -1,7 +1,7 @@
 # Copyright 2023 Volvo Car Corporation
 # Licensed under Apache 2.0.
 
-from collections import MutableMapping
+from collections.abc import MutableMapping
 
 
 class Edge:

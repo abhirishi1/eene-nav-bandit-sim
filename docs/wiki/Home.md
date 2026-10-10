@@ -34,7 +34,7 @@ eene-nav-bandit-sim/                  repository root
 
 ## Quick start
 
-From the inner `eene-nav-bandit-sim/` folder, using Python 3.9 (see [Dependencies](Dependencies.md)):
+From the inner `eene-nav-bandit-sim/` folder, using Python 3.12 (3.9 to 3.12 are supported; see [Dependencies](Dependencies.md)):
 
 ```bash
 pip install -r ../requirements.txt

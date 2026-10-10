@@ -47,9 +47,14 @@ flowchart LR
 
 ## Python versions
 
-The README says the project was developed with Python 3.9. Results of installing the exact pinned versions and running the 12 tests on each Python version:
+The project was developed with Python 3.9. This branch supports **Python 3.9 to 3.12**:
 
-| Python | Security support | Installs? | Tests (code as-is) | Tests (with the one-line import fix) |
+- `setup.py` sets `python_requires=">=3.9,<3.13"`, so `pip install .` refuses unsupported versions up front.
+- `.python-version` (repository root) contains `3.12`, which tools such as pyenv and uv use to pick the interpreter.
+
+Results of installing the exact pinned versions and running the 12 tests on each Python version:
+
+| Python | Security support | Installs? | Tests (original `baseline` code) | Tests (this branch) |
 |--------|------------------|-----------|--------------------|--------------------------------------|
 | 3.9 | ended Oct 2025 | yes | 12 pass | 12 pass |
 | 3.10 | ended Oct 2026 | yes | **fail to start** | 12 pass |
@@ -57,7 +62,7 @@ The README says the project was developed with Python 3.9. Results of installing
 | 3.12 | until Oct 2028 | yes | **fail to start** | 12 pass |
 | 3.13 | until Oct 2029 | **no**: SciPy 1.11 won't build | n/a | n/a |
 
-- **Why 3.10+ fails:** `util/road_graph.py` uses `from collections import MutableMapping`, which Python removed in 3.10. Changing it to `collections.abc` fixes it and gives identical simulation results (bug 2 in the bug report). This branch keeps the original code, so use Python 3.9 here.
+- **Why 3.10+ fails:** `util/road_graph.py` uses `from collections import MutableMapping`, which Python removed in 3.10. This branch changes it to `collections.abc`, which works on 3.9 too and gives identical simulation results (bug 2 in the bug report).
 - **Upgrading past 3.12** would need newer SciPy (and likely NumPy) versions, which could slightly change the numbers.
 
 ## Dependency risks
