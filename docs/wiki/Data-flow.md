@@ -47,7 +47,7 @@ The start and end of the trip (`--start-node-id`, `--end-node-id`) must be the `
 
 ## Step 1: preprocessing (`charging_graph_preprocesser.py`)
 
-1. **Read** both CSVs with pandas.
+1. **Read and check** both CSVs with pandas. `util/csv_validation.py` lists every missing column, blank or invalid value, duplicate `station_id` and station `node_id` that isn't in the road graph, with its line number, and the script stops before doing any work.
 2. **Keep one station per junction.** `filter_charging_stations` keeps the highest-power station when several share a `node_id`. *N* = the number of stations left.
 3. **Build the road graph** as a `RoadGraph`, plus a NetworkX `DiGraph` weighted by driving time.
 4. **For each station:** find the *fastest* path to every junction (Dijkstra on driving time), then add up both time and energy along those paths (`add_consumption_to_distances`).
@@ -64,7 +64,7 @@ The start and end of the trip (`--start-node-id`, `--end-node-id`) must be the `
    - Priors: `--queue-prior-param-*`, `--charge-prior-param-*`.
    - Battery capacity: default 252,000,000 J = 70 kWh.
    - Number of trips and runs, start seed.
-2. **Load** the station CSV, the ID CSV and both tables.
+2. **Load and check** the station CSV (the same station checks, plus: the start and end nodes must be station `node_id`s), then load the ID CSV and both tables.
 3. **Create experiments** (`create_experiments`): for each run *r*, four `BanditExperiment`s, one per strategy (IDs `4r` to `4r+3`).
    - The real world uses seed `start_seed + r`. Each strategy's private planning copy uses seed `start_seed + runs + r`.
    - So in a given run, all four strategies are meant to face the same world. Bug 11 (an unseeded sampler) means the hidden charging powers can still differ.
@@ -141,7 +141,7 @@ Bug numbers refer to [`docs/BUG_REPORT.md`](https://github.com/abhirishi1/eene-n
 
 | Stage | Issue |
 |-------|-------|
-| Inputs | **No validation of blank values** (tested on small synthetic data, not yet in the bug report). A blank `power` stops step 1 with a cryptic `KeyError`. A blank `mean_time` passes step 1, but step 2 then doesn't finish (still running after 60 s in testing). A blank `mean_consumption` gives no error and silently leaves blank entries in the energy table |
+| Inputs | Checked by `util/csv_validation.py` on this branch. On the original code, a blank `power` stops step 1 with a cryptic `KeyError`, a blank `mean_time` makes step 2 run without finishing (still running after 60 s in testing), and a blank `mean_consumption` silently leaves blank entries in the energy table. The checks don't cover values that are filled in but wrong, e.g. an implausible energy figure |
 | Starting either script | Python 3.10+ won't start on the original code (bug 2, fixed on this branch). Missing required arguments give a confusing error (bug 9) |
 | Saving outputs (both steps) | `--output-dir` without a trailing `/` puts files next to the folder, not inside it (bug 6) |
 | Step 2, loading IDs | Numeric station IDs (e.g. `101`) crash with `KeyError` (bug 1) |

@@ -13,7 +13,7 @@
 | NetworkX | `~=3.2.1` | `dijkstra_predecessor_and_distance` (shortest driving-time paths in step 1), `DiGraph` + `astar_path` (best route through the charging graph in step 2) | `charging_graph_preprocesser.py`, `navigation/env_impl.py` |
 | pandas | `~=2.1.3` | Reading the input CSVs; collecting and writing `results.csv`; grouping results for the chart | both scripts, `navigation/env_impl.py` |
 | Matplotlib | `~=3.8.1` | Drawing `regret_plot.png` | `sim_runner.py` only |
-| pytest | `~=7.4.3` | Running the 12 tests (not used by the simulator itself) | `tests/` |
+| pytest | `~=7.4.3` | Running the 24 tests (not used by the simulator itself) | `tests/` |
 
 From Python's standard library the code uses `argparse`, `logging`, `collections`, `enum`, `functools.partial` and `typing`.
 
@@ -31,6 +31,8 @@ flowchart LR
     SIM --> ENVI[navigation/env_impl.py]
     SIM --> ALGI[navigation/alg_impl.py]
     PRE[charging_graph_preprocesser.py] --> RG[util/road_graph.py]
+    PRE --> CV[util/csv_validation.py]
+    SIM --> CV
     ALGI --> CALG[core/alg.py]
     ALGI --> ENVI
     ALGI --> UG[util/utils_gamma.py]
@@ -42,7 +44,7 @@ flowchart LR
 ```
 
 - `core/` imports nothing from the project, so it is independent of the EV problem.
-- The two scripts share no code; `charging_graph_preprocesser.py` only needs `util/road_graph.py`.
+- Both scripts use `util/csv_validation.py` to check their input files. Apart from that, `charging_graph_preprocesser.py` only needs `util/road_graph.py`.
 - Imports are written relative to the inner `eene-nav-bandit-sim/` folder (e.g. `from core.exp import ...`). That is why the scripts and tests must be run from that folder.
 
 ## Python versions
@@ -52,7 +54,7 @@ The project was developed with Python 3.9. This branch supports **Python 3.9 to 
 - `setup.py` sets `python_requires=">=3.9,<3.13"`, so `pip install .` refuses unsupported versions up front.
 - `.python-version` (repository root) contains `3.12`, which tools such as pyenv and uv use to pick the interpreter.
 
-Results of installing the exact pinned versions and running the 12 tests on each Python version:
+Results of installing the exact pinned versions and running the original 12 tests on each Python version (the 12 CSV-validation tests added later also pass on 3.9 and 3.12):
 
 | Python | Security support | Installs? | Tests (original `baseline` code) | Tests (this branch) |
 |--------|------------------|-----------|--------------------|--------------------------------------|

@@ -25,8 +25,11 @@ flowchart TB
         RG["road_graph.py: RoadGraph, Edge"]
         UG["utils_gamma.py: charging-power prior maths"]
         CM["common.py: Monte Carlo estimate, fallback sampler"]
+        CV["csv_validation.py: input CSV checks"]
     end
     PRE --> RG
+    PRE --> CV
+    SIM --> CV
     SIM --> EXP
     SIM --> NENV
     SIM --> NALG
@@ -132,6 +135,7 @@ They differ only in how `select_action` turns beliefs into a route:
 ### `util/`
 - **`road_graph.py`**: `RoadGraph` maps a node ID to its outgoing edges; `VertexOutgoingEdges` maps a target node ID to an `Edge`; `Edge` holds attributes such as `edge_type`, `parameters` and `expected_weight`.
 - **`utils_gamma.py`**: the log-density, its derivative and the mode (found with `scipy.optimize.minimize`) of the GamCon-II distribution, plus `GammaConjugatePriorAlphaDist`, the wrapper the SciPy sampler needs.
+- **`csv_validation.py`**: checks the input CSVs before the scripts do any work (required columns, blank or invalid values, duplicate station IDs, unknown nodes, start/end nodes) and returns every problem with its line number.
 - **`common.py`**: `mc_estimate_of_mean_charge_power_reciprocal` estimates the average of 1/power from 1,000 random samples; `MillerDummyModeSampler` is a stand-in "sampler" that always returns one fixed value.
 
 ## The charging graph

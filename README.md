@@ -63,6 +63,12 @@ and `node_x` should contain the `string` vertex ID and the `float` Y and `float`
 graph vertex to each charging station. The `power` column should contain the `float` power (in `watts`) provided by
 each charging station.
 
+Both scripts check these files before doing any work. They report missing columns, blank IDs, blank or non-numeric
+`mean_consumption`, `mean_time` and `power` values, `mean_time` or `power` values that are not greater than 0,
+duplicate `station_id` values, station `node_id` values that are not in the road graph (preprocessing only) and
+start/end node IDs that are not the `node_id` of a charging station (simulation only). Every problem found is listed
+with its file name and line number, and the script stops. Zero or negative `mean_consumption` values are allowed.
+
 While these files are not provided in this repository, the public data sources used in the paper are 
 [OpenStreetMap](https://www.openstreetmap.org/) and [Open Charge Map](https://openchargemap.org/) for the road graph
 and charging station list, respectively. The mean energy consumption can be computed using the formula in Eq. 15 of 

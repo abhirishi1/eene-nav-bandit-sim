@@ -29,7 +29,7 @@ eene-nav-bandit-sim/                  repository root
     ├── core/          generic "learn over repeated trials" building blocks
     ├── navigation/    the EV trip world and the 4 strategies
     ├── util/          road-graph data structure, probability maths, samplers
-    └── tests/         12 pytest tests
+    └── tests/         24 pytest tests
 ```
 
 ## Quick start
@@ -38,7 +38,7 @@ From the inner `eene-nav-bandit-sim/` folder, using Python 3.12 (3.9 to 3.12 are
 
 ```bash
 pip install -r ../requirements.txt
-python -m pytest tests                     # 12 tests
+python -m pytest tests                     # 24 tests
 python charging_graph_preprocesser.py --road-graph-csv-path ROAD.csv --charging-station-csv-path STATIONS.csv
 python sim_runner.py --charging-station-csv-path STATIONS.csv --start-node-id START --end-node-id END
 ```

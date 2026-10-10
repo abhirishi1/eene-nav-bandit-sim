@@ -1,6 +1,7 @@
 # Copyright 2023 Volvo Car Corporation
 # Licensed under Apache 2.0.
 
+import os
 import logging
 import argparse
 from functools import partial
@@ -17,6 +18,7 @@ from navigation.alg_impl import GreedyNavigationBanditAlgorithm
 from navigation.alg_impl import EpsilonGreedyNavigationBanditAlgorithm
 from navigation.alg_impl import ThompsonSamplingNavigationBanditAlgorithm
 from navigation.alg_impl import BayesUcbNavigationBanditAlgorithm
+from util.csv_validation import validate_charging_station_df, validate_trip_end_points, format_validation_errors
 
 
 def main():
@@ -60,6 +62,12 @@ def main():
 
     # Load Charging Graph DataFrames
     charging_station_df = pd.read_csv(args.charging_station_csv_path)
+    station_csv_name = os.path.basename(args.charging_station_csv_path)
+    validation_errors = (validate_charging_station_df(charging_station_df, station_csv_name) +
+                         validate_trip_end_points(charging_station_df, args.start_node_id, args.end_node_id,
+                                                  station_csv_name))
+    if validation_errors:
+        raise SystemExit(format_validation_errors(validation_errors))
     charging_graph_ids_df = pd.read_csv(args.charging_graph_ids_csv_path)
 
     # Load pre-computed time and consumption matrices
