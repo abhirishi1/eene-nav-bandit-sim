@@ -143,7 +143,7 @@ Bug numbers refer to [`docs/BUG_REPORT.md`](https://github.com/abhirishi1/eene-n
 |-------|-------|
 | Inputs | Checked by `util/csv_validation.py` on this branch. On the original code, a blank `power` stops step 1 with a cryptic `KeyError`, a blank `mean_time` makes step 2 run without finishing (still running after 60 s in testing), and a blank `mean_consumption` silently leaves blank entries in the energy table. The checks don't cover values that are filled in but wrong, e.g. an implausible energy figure |
 | Starting either script | Python 3.10+ won't start on the original code (bug 2, fixed on this branch). Missing required arguments give a confusing error (bug 9) |
-| Saving outputs (both steps) | `--output-dir` without a trailing `/` puts files next to the folder, not inside it (bug 6) |
+| Saving outputs (both steps) | Fixed on this branch: paths are joined with `os.path.join` and a missing folder is created. On the original code, `--output-dir` without a trailing `/` puts files next to the folder, not inside it (bug 6) |
 | Step 2, loading IDs | Numeric station IDs (e.g. `101`) crash with `KeyError` (bug 1) |
 | Step 2, experiment setup | The SciPy sampler ignores the seed, so results vary between identical runs (bug 11, found later and not yet in the report) |
 | Each trip, Epsilon-Greedy detours | Can loop forever if no detour station is reachable (bug 3). Start and end stations aren't reliably excluded (bug 5). No test covers this (bug 7) |

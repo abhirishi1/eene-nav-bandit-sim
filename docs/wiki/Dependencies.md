@@ -13,9 +13,9 @@
 | NetworkX | `~=3.2.1` | `dijkstra_predecessor_and_distance` (shortest driving-time paths in step 1), `DiGraph` + `astar_path` (best route through the charging graph in step 2) | `charging_graph_preprocesser.py`, `navigation/env_impl.py` |
 | pandas | `~=2.1.3` | Reading the input CSVs; collecting and writing `results.csv`; grouping results for the chart | both scripts, `navigation/env_impl.py` |
 | Matplotlib | `~=3.8.1` | Drawing `regret_plot.png` | `sim_runner.py` only |
-| pytest | `~=7.4.3` | Running the 24 tests (not used by the simulator itself) | `tests/` |
+| pytest | `~=7.4.3` | Running the 26 tests (not used by the simulator itself) | `tests/` |
 
-From Python's standard library the code uses `argparse`, `logging`, `collections`, `enum`, `functools.partial` and `typing`.
+From Python's standard library the code uses `argparse`, `logging`, `os` (output paths and folders), `collections`, `enum`, `functools.partial` and `typing`.
 
 Two things to know about these files:
 - `setup.py` has no `install_requires`, so `pip install .` does **not** install these libraries. Use `pip install -r requirements.txt`.
@@ -54,7 +54,7 @@ The project was developed with Python 3.9. This branch supports **Python 3.9 to 
 - `setup.py` sets `python_requires=">=3.9,<3.13"`, so `pip install .` refuses unsupported versions up front.
 - `.python-version` (repository root) contains `3.12`, which tools such as pyenv and uv use to pick the interpreter.
 
-Results of installing the exact pinned versions and running the original 12 tests on each Python version (the 12 CSV-validation tests added later also pass on 3.9 and 3.12):
+Results of installing the exact pinned versions and running the original 12 tests on each Python version (the 14 tests added later, for CSV validation and saving outputs, also pass on 3.9 and 3.12):
 
 | Python | Security support | Installs? | Tests (original `baseline` code) | Tests (this branch) |
 |--------|------------------|-----------|--------------------|--------------------------------------|
