@@ -83,8 +83,9 @@ def main():
     complete_consumption_array = np.vstack(finished_consumption_arrays)
     logging.info('Stacked all arrays')
 
-    np.save(args.output_dir + 'complete_time_array.npy', complete_time_array)
-    np.save(args.output_dir + 'complete_consumption_array.npy', complete_consumption_array)
+    os.makedirs(args.output_dir, exist_ok=True)
+    np.save(os.path.join(args.output_dir, 'complete_time_array.npy'), complete_time_array)
+    np.save(os.path.join(args.output_dir, 'complete_consumption_array.npy'), complete_consumption_array)
     logging.info('Saved time and consumption arrays')
 
     station_ids = []
@@ -97,7 +98,7 @@ def main():
     charging_id_df = pd.DataFrame({'station_id': station_ids,
                                    'node_id': node_ids,
                                    'matrix_id': matrix_ids})
-    charging_id_df.to_csv(args.output_dir + 'charging_graph_ids.csv')
+    charging_id_df.to_csv(os.path.join(args.output_dir, 'charging_graph_ids.csv'))
     logging.info('Stored charging graph IDs')
     logging.info('Finished preprocessing charging station graph, closing.')
 

@@ -114,12 +114,22 @@ def main():
     results_df = pd.DataFrame(data=results)
     logging.info("Finished bandit navigation simulation!")
 
-    results_df.to_csv(args.output_dir + 'results.csv')
-    logging.info("Saved results CSV to: " + args.output_dir + 'results.csv')
+    save_results(results_df, args.output_dir)
 
+
+def save_results(results_df, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+
+    results_csv_path = os.path.join(output_dir, 'results.csv')
+    results_df.to_csv(results_csv_path)
+    logging.info("Saved results CSV to: " + results_csv_path)
+
+    regret_plot_path = os.path.join(output_dir, 'regret_plot.png')
     fig = create_regret_plot(results_df)
-    fig.savefig(args.output_dir + 'regret_plot.png', bbox_inches='tight', pad_inches=0, dpi=300)
-    logging.info("Saved regret plot to: " + args.output_dir + 'regret_plot.png')
+    fig.savefig(regret_plot_path, bbox_inches='tight', pad_inches=0, dpi=300)
+    plt.close(fig)
+    logging.info("Saved regret plot to: " + regret_plot_path)
+    return results_csv_path, regret_plot_path
 
 
 def create_experiments(number_of_experiment_runs,
