@@ -3,6 +3,7 @@
 
 import logging
 import argparse
+import os
 from collections import OrderedDict, deque, defaultdict
 
 import numpy as np
@@ -10,6 +11,7 @@ import pandas as pd
 import networkx as nx
 
 from util.road_graph import RoadGraph, Edge, VertexOutgoingEdges
+from util.csv_validation import find_column_problems, raise_if_problems, ROAD_GRAPH_COLUMNS, CHARGING_STATION_COLUMNS
 
 
 def main():
@@ -29,6 +31,10 @@ def main():
     logging.info('Loaded source network DataFrame, size: ' + str(graph_df.shape[0]))
 
     charging_station_df = pd.read_csv(args.charging_station_csv_path)
+    raise_if_problems(
+        find_column_problems(graph_df, ROAD_GRAPH_COLUMNS, os.path.basename(args.road_graph_csv_path)) +
+        find_column_problems(charging_station_df, CHARGING_STATION_COLUMNS,
+                             os.path.basename(args.charging_station_csv_path)))
     logging.info('Loaded source charging stations DataFrame, size: ' + str(charging_station_df.shape[0]))
 
     filtered_charging_station_df = filter_charging_stations(charging_station_df)
