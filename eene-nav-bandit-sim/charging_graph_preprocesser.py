@@ -1,6 +1,7 @@
 # Copyright 2023 Volvo Car Corporation
 # Licensed under Apache 2.0.
 
+import os
 import logging
 import argparse
 from collections import OrderedDict, deque, defaultdict
@@ -10,6 +11,7 @@ import pandas as pd
 import networkx as nx
 
 from util.road_graph import RoadGraph, Edge, VertexOutgoingEdges
+from util.csv_validation import validate_road_graph_df, validate_charging_station_df, format_validation_errors
 
 
 def main():
@@ -30,6 +32,13 @@ def main():
 
     charging_station_df = pd.read_csv(args.charging_station_csv_path)
     logging.info('Loaded source charging stations DataFrame, size: ' + str(charging_station_df.shape[0]))
+
+    validation_errors = (validate_road_graph_df(graph_df, os.path.basename(args.road_graph_csv_path)) +
+                         validate_charging_station_df(charging_station_df,
+                                                      os.path.basename(args.charging_station_csv_path),
+                                                      road_graph_df=graph_df))
+    if validation_errors:
+        raise SystemExit(format_validation_errors(validation_errors))
 
     filtered_charging_station_df = filter_charging_stations(charging_station_df)
     logging.info('Filtered source charging stations DataFrame, size: ' + str(filtered_charging_station_df.shape[0]))
@@ -74,8 +83,9 @@ def main():
     complete_consumption_array = np.vstack(finished_consumption_arrays)
     logging.info('Stacked all arrays')
 
-    np.save(args.output_dir + 'complete_time_array.npy', complete_time_array)
-    np.save(args.output_dir + 'complete_consumption_array.npy', complete_consumption_array)
+    os.makedirs(args.output_dir, exist_ok=True)
+    np.save(os.path.join(args.output_dir, 'complete_time_array.npy'), complete_time_array)
+    np.save(os.path.join(args.output_dir, 'complete_consumption_array.npy'), complete_consumption_array)
     logging.info('Saved time and consumption arrays')
 
     station_ids = []
@@ -88,7 +98,7 @@ def main():
     charging_id_df = pd.DataFrame({'station_id': station_ids,
                                    'node_id': node_ids,
                                    'matrix_id': matrix_ids})
-    charging_id_df.to_csv(args.output_dir + 'charging_graph_ids.csv')
+    charging_id_df.to_csv(os.path.join(args.output_dir, 'charging_graph_ids.csv'))
     logging.info('Stored charging graph IDs')
     logging.info('Finished preprocessing charging station graph, closing.')
 

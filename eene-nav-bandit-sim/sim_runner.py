@@ -1,6 +1,7 @@
 # Copyright 2023 Volvo Car Corporation
 # Licensed under Apache 2.0.
 
+import os
 import logging
 import argparse
 from functools import partial
@@ -17,6 +18,7 @@ from navigation.alg_impl import GreedyNavigationBanditAlgorithm
 from navigation.alg_impl import EpsilonGreedyNavigationBanditAlgorithm
 from navigation.alg_impl import ThompsonSamplingNavigationBanditAlgorithm
 from navigation.alg_impl import BayesUcbNavigationBanditAlgorithm
+from util.csv_validation import validate_charging_station_df, validate_trip_end_points, format_validation_errors
 
 
 def main():
@@ -60,6 +62,12 @@ def main():
 
     # Load Charging Graph DataFrames
     charging_station_df = pd.read_csv(args.charging_station_csv_path)
+    station_csv_name = os.path.basename(args.charging_station_csv_path)
+    validation_errors = (validate_charging_station_df(charging_station_df, station_csv_name) +
+                         validate_trip_end_points(charging_station_df, args.start_node_id, args.end_node_id,
+                                                  station_csv_name))
+    if validation_errors:
+        raise SystemExit(format_validation_errors(validation_errors))
     charging_graph_ids_df = pd.read_csv(args.charging_graph_ids_csv_path)
 
     # Load pre-computed time and consumption matrices
@@ -106,12 +114,22 @@ def main():
     results_df = pd.DataFrame(data=results)
     logging.info("Finished bandit navigation simulation!")
 
-    results_df.to_csv(args.output_dir + 'results.csv')
-    logging.info("Saved results CSV to: " + args.output_dir + 'results.csv')
+    save_results(results_df, args.output_dir)
 
+
+def save_results(results_df, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+
+    results_csv_path = os.path.join(output_dir, 'results.csv')
+    results_df.to_csv(results_csv_path)
+    logging.info("Saved results CSV to: " + results_csv_path)
+
+    regret_plot_path = os.path.join(output_dir, 'regret_plot.png')
     fig = create_regret_plot(results_df)
-    fig.savefig(args.output_dir + 'regret_plot.png', bbox_inches='tight', pad_inches=0, dpi=300)
-    logging.info("Saved regret plot to: " + args.output_dir + 'regret_plot.png')
+    fig.savefig(regret_plot_path, bbox_inches='tight', pad_inches=0, dpi=300)
+    plt.close(fig)
+    logging.info("Saved regret plot to: " + regret_plot_path)
+    return results_csv_path, regret_plot_path
 
 
 def create_experiments(number_of_experiment_runs,

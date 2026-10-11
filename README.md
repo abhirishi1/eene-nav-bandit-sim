@@ -23,7 +23,9 @@ Please cite us in the following way you use the code for new publications:
 
 ## Dependencies
 
-The project is developed using Python 3.9, with the following dependencies and (tested) versions:
+The project was developed using Python 3.9 and also runs on Python 3.10 to 3.12 with the versions pinned in
+`requirements.txt` (Python 3.12 is recommended; Python 3.13 is not supported by the pinned SciPy version).
+Install the dependencies with `pip install -r requirements.txt`. The following dependency versions were tested:
 
 | Dependency |             Version |
 |:-----------|--------------------:|
@@ -60,6 +62,12 @@ The column `station_id` should contain distinct `string` IDs for all charging st
 and `node_x` should contain the `string` vertex ID and the `float` Y and `float` X coordinates of the closest road
 graph vertex to each charging station. The `power` column should contain the `float` power (in `watts`) provided by
 each charging station.
+
+Both scripts check these files before doing any work. They report missing columns, blank IDs, blank or non-numeric
+`mean_consumption`, `mean_time` and `power` values, `mean_time` or `power` values that are not greater than 0,
+duplicate `station_id` values, station `node_id` values that are not in the road graph (preprocessing only) and
+start/end node IDs that are not the `node_id` of a charging station (simulation only). Every problem found is listed
+with its file name and line number, and the script stops. Zero or negative `mean_consumption` values are allowed.
 
 While these files are not provided in this repository, the public data sources used in the paper are 
 [OpenStreetMap](https://www.openstreetmap.org/) and [Open Charge Map](https://openchargemap.org/) for the road graph
