@@ -153,7 +153,9 @@ Both scripts check their input CSVs straight after reading them, using `util/csv
 The check looks for two things:
 
 1. **A required column is missing.** The report names the column and lists the columns that were found.
-2. **A required cell is blank.** The report gives the file, the line number (the header is line 1) and the blank column(s). Below that it shows the whole row, with each blank cell marked `>>> MISSING <<<`.
+2. **A required cell is blank.** A cell holding only spaces counts as blank too. The report gives the file, the line number and the blank column(s). Below that it shows the whole row, with each blank cell marked `>>> MISSING <<<`.
+   - Line numbers are the real lines in the file, as a text editor shows them: the header is line 1, and empty lines and cells that run over several lines are counted.
+   - If the file can't be re-read to count lines, the report says "data row N" instead (the first row after the header is data row 1).
 
 If anything is found, the script lists **every** problem at once and stops with exit code 1, before doing any calculation. No output files are written. Complete files are processed exactly as before: the outputs are byte-for-byte the same as on the original code.
 

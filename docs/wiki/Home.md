@@ -28,7 +28,7 @@ eene-nav-bandit-sim/                  repository root
     ├── core/          generic "learn over repeated trials" building blocks
     ├── navigation/    the EV trip world and the 4 strategies
     ├── util/          road-graph data structure, missing-data check for input CSVs, probability maths, samplers
-    └── tests/         17 pytest tests
+    └── tests/         19 pytest tests
 ```
 
 ## Quick start
@@ -37,13 +37,13 @@ From the inner `eene-nav-bandit-sim/` folder, using Python 3.9 (see [Python and 
 
 ```bash
 pip install -r ../requirements.txt
-python -m pytest tests                     # 17 tests
+python -m pytest tests                     # 19 tests
 python charging_graph_preprocesser.py --road-graph-csv-path ROAD.csv --charging-station-csv-path STATIONS.csv
 python sim_runner.py --charging-station-csv-path STATIONS.csv --start-node-id START --end-node-id END
 ```
 
 The repository ships no road or station data. You supply both as CSV files (formats in [Data flow](Data-flow.md)).
-Both scripts check those files for blank cells and missing columns before doing any work, and stop with a report that marks each gap (see [Missing-data check](Data-flow.md#missing-data-check)).
+Both scripts check those files for blank cells (including cells with only spaces) and missing columns before doing any work, and stop with a report that marks each gap (see [Missing-data check](Data-flow.md#missing-data-check)).
 
 ## Python and libraries
 

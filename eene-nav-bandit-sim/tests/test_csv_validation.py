@@ -44,25 +44,62 @@ def run_preprocesser(tmp_path, road_graph_df, charging_station_df):
                           cwd=CODE_DIR, capture_output=True, text=True)
 
 
-def test_complete_csvs_have_no_missing_data():
-    assert find_missing_data(create_road_graph_df(), ROAD_GRAPH_COLUMNS, 'road.csv') == []
-    assert find_missing_data(create_charging_station_df(), CHARGING_STATION_COLUMNS, 'stations.csv') == []
+def write_csv(tmp_path, file_name, text):
+    csv_path = str(tmp_path / file_name)
+    with open(csv_path, 'w', newline='') as csv_file:
+        csv_file.write(text)
+    return csv_path
 
 
-def test_blank_values_are_highlighted_in_their_row():
+def test_complete_csvs_have_no_missing_data(tmp_path):
+    road_csv_path = str(tmp_path / 'road.csv')
+    station_csv_path = str(tmp_path / 'stations.csv')
+    create_road_graph_df().to_csv(road_csv_path, index=False)
+    create_charging_station_df().to_csv(station_csv_path, index=False)
+    assert find_missing_data(pd.read_csv(road_csv_path), ROAD_GRAPH_COLUMNS, road_csv_path) == []
+    assert find_missing_data(pd.read_csv(station_csv_path), CHARGING_STATION_COLUMNS, station_csv_path) == []
+
+
+def test_blank_values_are_highlighted_in_their_row(tmp_path):
     road_graph_df = create_road_graph_df()
     road_graph_df.loc[2, 'mean_time'] = np.nan
     road_graph_df.loc[2, 'mean_consumption'] = np.nan
-    problems = find_missing_data(road_graph_df, ROAD_GRAPH_COLUMNS, 'road.csv')
+    road_csv_path = str(tmp_path / 'road.csv')
+    road_graph_df.to_csv(road_csv_path, index=False)
+    problems = find_missing_data(pd.read_csv(road_csv_path), ROAD_GRAPH_COLUMNS, road_csv_path)
     assert len(problems) == 1
     assert problems[0].startswith("road.csv line 4: blank 'mean_consumption', 'mean_time'")
     assert 'from_id=B | ' in problems[0]
     assert 'mean_consumption=>>> MISSING <<< | mean_time=>>> MISSING <<<' in problems[0]
 
 
-def test_missing_column_is_reported():
-    charging_station_df = create_charging_station_df().drop(columns=['power'])
-    problems = find_missing_data(charging_station_df, CHARGING_STATION_COLUMNS, 'stations.csv')
+def test_space_only_cells_count_as_blank(tmp_path):
+    station_csv_path = write_csv(tmp_path, 'stations.csv',
+                                 'station_id,node_id,node_y,node_x,power\n'
+                                 'S_A,A,0.0,0.0,50000\n'
+                                 'S_C,C,0.0,2.0,   \n')
+    problems = find_missing_data(pd.read_csv(station_csv_path), CHARGING_STATION_COLUMNS, station_csv_path)
+    assert len(problems) == 1
+    assert problems[0].startswith("stations.csv line 3: blank 'power'")
+
+
+def test_line_numbers_count_empty_lines_and_multi_line_cells(tmp_path):
+    station_csv_path = write_csv(tmp_path, 'stations.csv',
+                                 'station_id,node_id,node_y,node_x,power\n'
+                                 '"S\nA",A,0.0,0.0,50000\n'
+                                 '\n'
+                                 '   \n'
+                                 'S_B,B,0.0,1.0,\n'
+                                 '\r\n'
+                                 'S_C,,0.0,2.0,100000\r\n')
+    problems = find_missing_data(pd.read_csv(station_csv_path), CHARGING_STATION_COLUMNS, station_csv_path)
+    assert [problem.split(':')[0] for problem in problems] == ['stations.csv line 6', 'stations.csv line 8']
+
+
+def test_missing_column_is_reported(tmp_path):
+    station_csv_path = str(tmp_path / 'stations.csv')
+    create_charging_station_df().drop(columns=['power']).to_csv(station_csv_path, index=False)
+    problems = find_missing_data(pd.read_csv(station_csv_path), CHARGING_STATION_COLUMNS, station_csv_path)
     assert problems == ["stations.csv: required column 'power' is missing "
                         "(columns found: station_id, node_id, node_y, node_x)"]
 

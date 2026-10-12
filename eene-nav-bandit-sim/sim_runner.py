@@ -3,7 +3,6 @@
 
 import logging
 import argparse
-import os
 from functools import partial
 
 import numpy as np
@@ -63,7 +62,7 @@ def main():
     # Load Charging Graph DataFrames
     charging_station_df = pd.read_csv(args.charging_station_csv_path)
     stop_if_missing_data(find_missing_data(charging_station_df, CHARGING_STATION_COLUMNS,
-                                           os.path.basename(args.charging_station_csv_path)))
+                                           args.charging_station_csv_path))
     charging_graph_ids_df = pd.read_csv(args.charging_graph_ids_csv_path)
 
     # Load pre-computed time and consumption matrices

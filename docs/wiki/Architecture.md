@@ -135,7 +135,7 @@ They differ only in how `select_action` turns beliefs into a route:
 ### `util/`
 - **`road_graph.py`**: `RoadGraph` maps a node ID to its outgoing edges; `VertexOutgoingEdges` maps a target node ID to an `Edge`; `Edge` holds attributes such as `edge_type`, `parameters` and `expected_weight`.
 - **`utils_gamma.py`**: the log-density, its derivative and the mode (found with `scipy.optimize.minimize`) of the GamCon-II distribution, plus `GammaConjugatePriorAlphaDist`, the wrapper the SciPy sampler needs.
-- **`csv_validation.py`**: `find_missing_data` lists every required column that is missing and every row with a blank required cell, showing the row with each blank marked `>>> MISSING <<<`. `stop_if_missing_data` stops the script with that list. The required columns are `ROAD_GRAPH_COLUMNS` and `CHARGING_STATION_COLUMNS`. See [Missing-data check](Data-flow.md#missing-data-check).
+- **`csv_validation.py`**: `find_missing_data` lists every required column that is missing and every row with a blank required cell (empty or only spaces), using the real line numbers from the file (`find_csv_line_numbers`), showing the row with each blank marked `>>> MISSING <<<`. `stop_if_missing_data` stops the script with that list. The required columns are `ROAD_GRAPH_COLUMNS` and `CHARGING_STATION_COLUMNS`. See [Missing-data check](Data-flow.md#missing-data-check).
 - **`common.py`**: `mc_estimate_of_mean_charge_power_reciprocal` estimates the average of 1/power from 1,000 random samples; `MillerDummyModeSampler` is a stand-in "sampler" that always returns one fixed value.
 
 ## The charging graph
