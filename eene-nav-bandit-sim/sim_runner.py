@@ -17,6 +17,7 @@ from navigation.alg_impl import GreedyNavigationBanditAlgorithm
 from navigation.alg_impl import EpsilonGreedyNavigationBanditAlgorithm
 from navigation.alg_impl import ThompsonSamplingNavigationBanditAlgorithm
 from navigation.alg_impl import BayesUcbNavigationBanditAlgorithm
+from util.csv_validation import find_missing_data, stop_if_missing_data, CHARGING_STATION_COLUMNS
 
 
 def main():
@@ -60,6 +61,8 @@ def main():
 
     # Load Charging Graph DataFrames
     charging_station_df = pd.read_csv(args.charging_station_csv_path)
+    stop_if_missing_data(find_missing_data(charging_station_df, CHARGING_STATION_COLUMNS,
+                                           args.charging_station_csv_path))
     charging_graph_ids_df = pd.read_csv(args.charging_graph_ids_csv_path)
 
     # Load pre-computed time and consumption matrices
