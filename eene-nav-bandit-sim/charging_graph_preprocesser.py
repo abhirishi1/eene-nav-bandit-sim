@@ -3,6 +3,7 @@
 
 import logging
 import argparse
+import os
 from collections import OrderedDict, deque, defaultdict
 
 import numpy as np
@@ -10,6 +11,7 @@ import pandas as pd
 import networkx as nx
 
 from util.road_graph import RoadGraph, Edge, VertexOutgoingEdges
+from util.csv_validation import find_missing_data, stop_if_missing_data, ROAD_GRAPH_COLUMNS, CHARGING_STATION_COLUMNS
 
 
 def main():
@@ -30,6 +32,12 @@ def main():
 
     charging_station_df = pd.read_csv(args.charging_station_csv_path)
     logging.info('Loaded source charging stations DataFrame, size: ' + str(charging_station_df.shape[0]))
+
+    stop_if_missing_data(
+        find_missing_data(graph_df, ROAD_GRAPH_COLUMNS, os.path.basename(args.road_graph_csv_path)) +
+        find_missing_data(charging_station_df, CHARGING_STATION_COLUMNS,
+                          os.path.basename(args.charging_station_csv_path)))
+    logging.info('Checked input CSVs: no missing data')
 
     filtered_charging_station_df = filter_charging_stations(charging_station_df)
     logging.info('Filtered source charging stations DataFrame, size: ' + str(filtered_charging_station_df.shape[0]))
