@@ -17,6 +17,7 @@ from navigation.alg_impl import GreedyNavigationBanditAlgorithm
 from navigation.alg_impl import EpsilonGreedyNavigationBanditAlgorithm
 from navigation.alg_impl import ThompsonSamplingNavigationBanditAlgorithm
 from navigation.alg_impl import BayesUcbNavigationBanditAlgorithm
+from util.input_validation import read_csv_with_string_ids, validate_columns, CHARGING_STATION_REQUIRED_COLUMNS
 
 
 def main():
@@ -44,7 +45,7 @@ def main():
     parser.add_argument('--queue-prior-param-alpha0', help='queue_prior_param_alpha0', type=float, default=2.)
     parser.add_argument('--queue-prior-param-beta0', help='queue_prior_param_beta0', type=float, default=2400.)
     parser.add_argument('--logging-level', help='logging_level', type=str, default='info')
-    args, unknown_args = parser.parse_known_args()
+    args = parser.parse_args()
 
     # Configure logging
     configure_logging(args)
@@ -59,8 +60,10 @@ def main():
                                s=args.charge_prior_param_s0)
 
     # Load Charging Graph DataFrames
-    charging_station_df = pd.read_csv(args.charging_station_csv_path)
-    charging_graph_ids_df = pd.read_csv(args.charging_graph_ids_csv_path)
+    charging_station_df = read_csv_with_string_ids(args.charging_station_csv_path)
+    validate_columns(charging_station_df, CHARGING_STATION_REQUIRED_COLUMNS,
+                     'Charging station CSV ' + str(args.charging_station_csv_path))
+    charging_graph_ids_df = read_csv_with_string_ids(args.charging_graph_ids_csv_path)
 
     # Load pre-computed time and consumption matrices
     charging_graph_consumption_ndarray = np.load(args.charging_consumption_npy_path)

@@ -10,6 +10,11 @@ import pandas as pd
 import networkx as nx
 
 from util.road_graph import RoadGraph, Edge, VertexOutgoingEdges
+from util.input_validation import (read_csv_with_string_ids, validate_columns, coerce_numeric,
+                                   ROAD_GRAPH_REQUIRED_COLUMNS, ROAD_GRAPH_NUMERIC_COLUMNS,
+                                   CHARGING_STATION_REQUIRED_COLUMNS, CHARGING_STATION_NUMERIC_COLUMNS)
+
+MAX_REPORTED_UNREACHABLE_PAIRS = 20
 
 
 def main():
@@ -18,18 +23,25 @@ def main():
     parser.add_argument('--charging-station-csv-path', help='charging_station_csv_path', type=str)
     parser.add_argument('--output-dir', help='output_dir', type=str, default='../output/')
     parser.add_argument('--logging-level', help='logging_level', type=str, default='info')
-    args, unknown_args = parser.parse_known_args()
+    args = parser.parse_args()
 
     # Configure logging
     configure_logging(args)
     logging.info("Starting charging graph preprocessing script!")
 
     logging.info('Starting charging station converter')
-    graph_df = pd.read_csv(args.road_graph_csv_path)
+    graph_df = read_csv_with_string_ids(args.road_graph_csv_path)
+    validate_columns(graph_df, ROAD_GRAPH_REQUIRED_COLUMNS, 'Road graph CSV ' + str(args.road_graph_csv_path))
     logging.info('Loaded source network DataFrame, size: ' + str(graph_df.shape[0]))
 
-    charging_station_df = pd.read_csv(args.charging_station_csv_path)
+    charging_station_df = read_csv_with_string_ids(args.charging_station_csv_path)
+    validate_columns(charging_station_df, CHARGING_STATION_REQUIRED_COLUMNS,
+                     'Charging station CSV ' + str(args.charging_station_csv_path))
     logging.info('Loaded source charging stations DataFrame, size: ' + str(charging_station_df.shape[0]))
+
+    coerce_numeric(graph_df, ROAD_GRAPH_NUMERIC_COLUMNS, 'Road graph CSV ' + str(args.road_graph_csv_path))
+    coerce_numeric(charging_station_df, CHARGING_STATION_NUMERIC_COLUMNS,
+                   'Charging station CSV ' + str(args.charging_station_csv_path))
 
     filtered_charging_station_df = filter_charging_stations(charging_station_df)
     logging.info('Filtered source charging stations DataFrame, size: ' + str(filtered_charging_station_df.shape[0]))
@@ -43,6 +55,7 @@ def main():
 
     source_charging_stations = create_charging_station_dictionary(filtered_charging_station_df)
     logging.info('Created charging station dictionary')
+    validate_station_nodes_in_graph(source_charging_stations, nx_graph)
 
     logging.info('Starting charging station preprocessing')
     finished_time_arrays = list()
@@ -73,6 +86,7 @@ def main():
     complete_time_array = np.vstack(finished_time_arrays)
     complete_consumption_array = np.vstack(finished_consumption_arrays)
     logging.info('Stacked all arrays')
+    validate_station_pairs_reachable(complete_time_array, complete_consumption_array, source_charging_stations)
 
     np.save(args.output_dir + 'complete_time_array.npy', complete_time_array)
     np.save(args.output_dir + 'complete_consumption_array.npy', complete_consumption_array)
@@ -153,6 +167,26 @@ def add_consumption_to_distances(predecessors, source_graph, start_node):
             consumption_distances[successor] = consumption_distances[node] + consumption_distance
             node_queue.append(successor)
     return consumption_distances
+
+
+def validate_station_nodes_in_graph(charging_stations, nx_graph):
+    unmatched = ['station_id=' + station_id + ' node_id=' + station['node_id']
+                 for station_id, station in charging_stations.items() if station['node_id'] not in nx_graph]
+    if unmatched:
+        raise ValueError(str(len(unmatched)) + ' charging station(s) have a node_id that is not in the road graph: ' +
+                         '; '.join(unmatched))
+
+
+def validate_station_pairs_reachable(time_array, consumption_array, charging_stations):
+    station_ids = list(charging_stations)
+    unreachable_rows, unreachable_cols = np.nonzero(np.isinf(time_array) | np.isinf(consumption_array))
+    if len(unreachable_rows) > 0:
+        pairs = [station_ids[i] + ' -> ' + station_ids[j] for i, j in zip(unreachable_rows, unreachable_cols)]
+        shown = pairs[:MAX_REPORTED_UNREACHABLE_PAIRS]
+        more = len(pairs) - len(shown)
+        raise ValueError(str(len(pairs)) + ' charging station pair(s) are unreachable in the road graph ' +
+                         '(from_station_id -> to_station_id): ' + '; '.join(shown) +
+                         ('; ... and ' + str(more) + ' more' if more > 0 else ''))
 
 
 def filter_charging_stations(charging_station_df):
