@@ -9,5 +9,6 @@ setup(
     license='Apache-2.0',
     author='nakerblo',
     author_email='nakerblo@volvocars.com',
-    description='EENE Navigation Bandit Simulator'
+    description='EENE Navigation Bandit Simulator',
+    python_requires='>=3.12,<3.13'
 )

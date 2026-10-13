@@ -23,16 +23,16 @@ Please cite us in the following way you use the code for new publications:
 
 ## Dependencies
 
-The project is developed using Python 3.9, with the following dependencies and (tested) versions:
+The project is developed using Python 3.12, with the following dependencies and (tested) versions:
 
-| Dependency |             Version |
-|:-----------|--------------------:|
-| NumPy      | `1.24.2` - `1.26.2` |
-| SciPy      |  `1.9.3` - `1.11.3` |
-| Matplotlib |   `3.6.2` - `3.8.1` |
-| Pandas     |   `1.4.3` - `2.1.3` |
-| NetworkX   |   `2.8.8` - `3.2.1` |
-| pytest     |             `7.4.3` |
+| Dependency | Version |
+|:-----------|--------:|
+| NumPy      | `1.26.4` |
+| SciPy      | `1.11.4` |
+| Matplotlib | `3.8.4` |
+| Pandas     | `2.1.4` |
+| NetworkX   | `3.2.1` |
+| pytest     | `7.4.4` |
 
 ## Input Data 
 
