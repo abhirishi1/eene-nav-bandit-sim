@@ -21,6 +21,12 @@ Please cite us in the following way you use the code for new publications:
 }
 ```
 
+## Documentation
+
+A documentation wiki is in the [`docs/`](docs/README.md) folder:
+[Overview](docs/overview.md), [Architecture](docs/architecture.md), [Data flows](docs/data-flows.md),
+[Algorithms](docs/algorithms.md) and [Usage](docs/usage.md).
+
 ## Dependencies
 
 The project was developed using Python 3.9 and also runs on Python 3.10 to 3.12 with the versions pinned in
