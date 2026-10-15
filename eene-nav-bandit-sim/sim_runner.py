@@ -3,6 +3,7 @@
 
 import logging
 import argparse
+import os
 from functools import partial
 
 import numpy as np
@@ -17,6 +18,7 @@ from navigation.alg_impl import GreedyNavigationBanditAlgorithm
 from navigation.alg_impl import EpsilonGreedyNavigationBanditAlgorithm
 from navigation.alg_impl import ThompsonSamplingNavigationBanditAlgorithm
 from navigation.alg_impl import BayesUcbNavigationBanditAlgorithm
+from util.csv_validation import check_required_columns, CHARGING_STATION_COLUMNS
 
 
 def main():
@@ -60,6 +62,8 @@ def main():
 
     # Load Charging Graph DataFrames
     charging_station_df = pd.read_csv(args.charging_station_csv_path)
+    check_required_columns(charging_station_df, CHARGING_STATION_COLUMNS,
+                           os.path.basename(args.charging_station_csv_path))
     charging_graph_ids_df = pd.read_csv(args.charging_graph_ids_csv_path)
 
     # Load pre-computed time and consumption matrices

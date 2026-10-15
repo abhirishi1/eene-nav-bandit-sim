@@ -23,7 +23,9 @@ Please cite us in the following way you use the code for new publications:
 
 ## Dependencies
 
-The project is developed using Python 3.9, with the following dependencies and (tested) versions:
+The project was developed using Python 3.9 and also runs on Python 3.10 to 3.12 with the versions pinned in
+`requirements.txt` (Python 3.12 is recommended; Python 3.13 is not supported by the pinned SciPy version).
+Install the dependencies with `pip install -r requirements.txt`. The following dependency versions were tested:
 
 | Dependency |             Version |
 |:-----------|--------------------:|
